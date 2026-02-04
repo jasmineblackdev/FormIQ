@@ -96,7 +96,10 @@ export function HomeCompleted({ onViewSummary }: HomeCompletedProps) {
       </div>
 
       {/* Next workout preview */}
-      <div className="p-4 rounded-xl bg-secondary border border-border">
+      <button 
+        onClick={onViewSummary}
+        className="w-full p-4 rounded-xl bg-secondary border border-border text-left hover:bg-accent transition-colors"
+      >
         <div className="flex items-center justify-between">
           <div>
             <p className="text-xs text-muted-foreground mb-1">Next Workout</p>
@@ -105,7 +108,7 @@ export function HomeCompleted({ onViewSummary }: HomeCompletedProps) {
           </div>
           <ChevronRight className="h-5 w-5 text-muted-foreground" />
         </div>
-      </div>
+      </button>
     </div>
   );
 }
