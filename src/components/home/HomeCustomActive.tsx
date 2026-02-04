@@ -6,6 +6,7 @@ import { Plus, Sparkles, ListPlus, Calendar, TrendingUp, ChevronRight } from "lu
 interface HomeCustomActiveProps {
   onStartWorkout?: () => void;
   onBrowseExercises?: () => void;
+  onViewProgress?: () => void;
 }
 
 const recentWorkouts = [
@@ -32,7 +33,7 @@ const recentWorkouts = [
   },
 ];
 
-export function HomeCustomActive({ onStartWorkout, onBrowseExercises }: HomeCustomActiveProps) {
+export function HomeCustomActive({ onStartWorkout, onBrowseExercises, onViewProgress }: HomeCustomActiveProps) {
   return (
     <div className="px-4 py-6 space-y-6 animate-slide-up">
       {/* Header greeting */}
@@ -84,7 +85,7 @@ export function HomeCustomActive({ onStartWorkout, onBrowseExercises }: HomeCust
             <Calendar className="h-4 w-4 text-primary" />
             Recent Activity
           </h3>
-          <Button variant="ghost" size="sm" className="text-primary text-xs">
+          <Button variant="ghost" size="sm" className="text-primary text-xs" onClick={onViewProgress}>
             View all <ChevronRight className="h-3 w-3 ml-1" />
           </Button>
         </div>
@@ -93,6 +94,7 @@ export function HomeCustomActive({ onStartWorkout, onBrowseExercises }: HomeCust
           {recentWorkouts.map((workout, index) => (
             <button
               key={index}
+              onClick={onViewProgress}
               className="w-full p-4 rounded-xl bg-card border border-border flex items-center gap-4 text-left hover:bg-accent transition-colors"
             >
               <FormScoreBadge score={workout.avgFormScore} size="sm" />
@@ -111,15 +113,19 @@ export function HomeCustomActive({ onStartWorkout, onBrowseExercises }: HomeCust
       </div>
 
       {/* Progress hint */}
-      <div className="p-4 rounded-xl bg-primary/10 border border-primary/20">
+      <button 
+        onClick={onViewProgress}
+        className="w-full p-4 rounded-xl bg-primary/10 border border-primary/20 text-left hover:bg-primary/15 transition-colors"
+      >
         <div className="flex items-center gap-3">
           <TrendingUp className="h-5 w-5 text-primary flex-shrink-0" />
           <div>
             <p className="text-sm font-medium text-foreground">Your form is improving!</p>
             <p className="text-xs text-muted-foreground">Average score up 8% this week</p>
           </div>
+          <ChevronRight className="h-4 w-4 text-primary ml-auto" />
         </div>
-      </div>
+      </button>
     </div>
   );
 }

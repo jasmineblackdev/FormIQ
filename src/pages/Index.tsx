@@ -28,6 +28,22 @@ const Index = () => {
     navigate("/active-workout");
   };
 
+  const handleBrowseExercises = () => {
+    navigate("/exercises");
+  };
+
+  const handleViewSummary = () => {
+    navigate("/workout-summary");
+  };
+
+  const handleViewProgram = () => {
+    navigate("/program");
+  };
+
+  const handleViewProgress = () => {
+    navigate("/analyze");
+  };
+
   // Program info based on current state
   const getProgramInfo = () => {
     switch (currentState) {
@@ -54,25 +70,34 @@ const Index = () => {
       case "mid-program":
         return <HomeMidProgram onStartWorkout={handleStartWorkout} />;
       case "rest-day":
-        return <HomeRestDay onViewNextWorkout={() => console.log("View next workout")} />;
+        return (
+          <HomeRestDay 
+            onViewNextWorkout={handleViewProgram}
+          />
+        );
       case "completed":
-        return <HomeCompleted onViewSummary={() => console.log("View summary")} />;
+        return (
+          <HomeCompleted 
+            onViewSummary={handleViewSummary}
+          />
+        );
       case "custom-empty":
         return (
           <HomeCustomEmpty 
             onStartWorkout={handleStartWorkout} 
-            onBrowseExercises={() => navigate("/exercises")}
+            onBrowseExercises={handleBrowseExercises}
           />
         );
       case "custom-active":
         return (
           <HomeCustomActive 
             onStartWorkout={handleStartWorkout} 
-            onBrowseExercises={() => navigate("/exercises")}
+            onBrowseExercises={handleBrowseExercises}
+            onViewProgress={handleViewProgress}
           />
         );
       default:
-        return <HomeFirstDay />;
+        return <HomeFirstDay onStartWorkout={handleStartWorkout} />;
     }
   };
 
