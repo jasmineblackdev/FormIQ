@@ -11,6 +11,7 @@ import {
   Target
 } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
 const recentExercises = [
@@ -21,8 +22,15 @@ const recentExercises = [
 ];
 
 const Record = () => {
+  const navigate = useNavigate();
   const [isRecording, setIsRecording] = useState(false);
   const [selectedExercise, setSelectedExercise] = useState<string | null>(null);
+
+  const handleStopRecording = () => {
+    setIsRecording(false);
+    // Navigate to form feedback after stopping recording
+    navigate('/form-feedback');
+  };
 
   return (
     <AppLayout hideProgress>
@@ -118,7 +126,7 @@ const Record = () => {
             </button>
 
             <button
-              onClick={() => setIsRecording(!isRecording)}
+              onClick={() => isRecording ? handleStopRecording() : setIsRecording(true)}
               className={cn(
                 "h-20 w-20 rounded-full flex items-center justify-center transition-all",
                 isRecording 
