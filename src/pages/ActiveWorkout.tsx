@@ -9,11 +9,17 @@ import {
   Plus, 
   Check, 
   X, 
-  Timer,
   Video,
   Trash2,
   Pause,
-  Play
+  Play,
+  Info,
+  ChevronDown,
+  ChevronUp,
+  Target,
+  CheckCircle2,
+  Volume2,
+  VolumeX
 } from "lucide-react";
 
 interface SetData {
@@ -30,6 +36,130 @@ interface ExerciseData {
   targetMuscle: string;
   sets: SetData[];
 }
+
+interface ExerciseInfo {
+  description: string;
+  howToPerform: string[];
+  tips: string[];
+  videoUrl: string;
+  videoPoster: string;
+}
+
+const exerciseInfoDatabase: Record<string, ExerciseInfo> = {
+  "Bench Press": {
+    description: "A compound pushing movement that primarily targets the chest, shoulders, and triceps.",
+    howToPerform: [
+      "Lie flat on the bench with your eyes directly under the bar",
+      "Grip the bar slightly wider than shoulder-width apart",
+      "Lower the bar in a controlled motion to your mid-chest",
+      "Press the bar back up by extending your arms",
+    ],
+    tips: [
+      "Keep shoulder blades pinched together",
+      "Maintain a slight arch in your lower back",
+      "Drive feet into the floor for stability"
+    ],
+    videoUrl: "",
+    videoPoster: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=800&h=450&fit=crop"
+  },
+  "Incline Dumbbell Press": {
+    description: "Targets the upper portion of the chest with emphasis on the clavicular head of the pectoralis major.",
+    howToPerform: [
+      "Set bench to 30-45 degree incline",
+      "Hold dumbbells at shoulder level with palms facing forward",
+      "Press dumbbells up and together above your chest",
+      "Lower with control back to starting position",
+    ],
+    tips: [
+      "Don't let dumbbells touch at the top",
+      "Keep core engaged throughout",
+      "Control the eccentric (lowering) phase"
+    ],
+    videoUrl: "",
+    videoPoster: "https://images.unsplash.com/photo-1581009146145-b5ef050c149a?w=800&h=450&fit=crop"
+  },
+  "Overhead Press": {
+    description: "A compound shoulder movement that builds pressing strength overhead.",
+    howToPerform: [
+      "Stand with feet shoulder-width apart, bar at shoulder height",
+      "Grip the bar just outside shoulder width",
+      "Press bar straight overhead while keeping core tight",
+      "Lock out arms at the top, then lower with control",
+    ],
+    tips: [
+      "Keep core tight to protect lower back",
+      "Don't lean back excessively",
+      "Full lockout at the top"
+    ],
+    videoUrl: "",
+    videoPoster: "https://images.unsplash.com/photo-1532029837206-abbe2b7620e3?w=800&h=450&fit=crop"
+  },
+  "Cable Flyes": {
+    description: "An isolation exercise that targets the chest muscles through a horizontal adduction movement.",
+    howToPerform: [
+      "Set cables at chest height, stand in center",
+      "Step forward with slight lean, arms extended to sides",
+      "Bring handles together in front of chest in arc motion",
+      "Squeeze chest at peak, return slowly to start",
+    ],
+    tips: [
+      "Maintain slight bend in elbows throughout",
+      "Focus on squeezing chest at peak contraction",
+      "Control the movement, don't let cables pull you back"
+    ],
+    videoUrl: "",
+    videoPoster: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&h=450&fit=crop"
+  },
+  "Tricep Pushdowns": {
+    description: "An isolation exercise targeting all three heads of the triceps using a cable machine.",
+    howToPerform: [
+      "Stand facing cable machine, grab bar with overhand grip",
+      "Keep elbows pinned to your sides",
+      "Push the bar down until arms are fully extended",
+      "Slowly return to starting position",
+    ],
+    tips: [
+      "Keep elbows stationary throughout",
+      "Squeeze triceps at the bottom",
+      "Don't use momentum or body swing"
+    ],
+    videoUrl: "",
+    videoPoster: "https://images.unsplash.com/photo-1530822847156-5df684ec5ee1?w=800&h=450&fit=crop"
+  },
+  "Lateral Raises": {
+    description: "An isolation exercise that targets the lateral deltoid to build wider shoulders.",
+    howToPerform: [
+      "Stand with dumbbells at your sides, slight bend in elbows",
+      "Raise arms out to the sides until parallel with floor",
+      "Keep slight bend in elbows throughout",
+      "Lower with control back to starting position",
+    ],
+    tips: [
+      "Lead with your elbows, not your hands",
+      "Don't swing or use momentum",
+      "Keep shoulders down, don't shrug"
+    ],
+    videoUrl: "",
+    videoPoster: "https://images.unsplash.com/photo-1581009137042-c552e485697a?w=800&h=450&fit=crop"
+  },
+};
+
+const defaultExerciseInfo: ExerciseInfo = {
+  description: "A targeted movement to build strength and muscle.",
+  howToPerform: [
+    "Set up with proper posture and grip",
+    "Initiate the movement with control",
+    "Move through the full range of motion",
+    "Return to starting position with control",
+  ],
+  tips: [
+    "Focus on form over weight",
+    "Control the movement throughout",
+    "Breathe steadily"
+  ],
+  videoUrl: "",
+  videoPoster: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&h=450&fit=crop"
+};
 
 const initialExercises: ExerciseData[] = [
   { 
@@ -108,6 +238,9 @@ const ActiveWorkout = () => {
   const [currentExerciseIndex, setCurrentExerciseIndex] = useState(0);
   const [elapsedTime, setElapsedTime] = useState(0);
   const [isTimerPaused, setIsTimerPaused] = useState(false);
+  const [showExerciseInfo, setShowExerciseInfo] = useState(false);
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Timer effect
@@ -125,7 +258,14 @@ const ActiveWorkout = () => {
     };
   }, [isTimerPaused]);
 
+  // Reset info panel when changing exercises
+  useEffect(() => {
+    setShowExerciseInfo(false);
+    setIsVideoPlaying(false);
+  }, [currentExerciseIndex]);
+
   const currentExercise = exercises[currentExerciseIndex];
+  const exerciseInfo = exerciseInfoDatabase[currentExercise.name] || defaultExerciseInfo;
   const completedSets = currentExercise.sets.filter(s => s.isCompleted).length;
   const totalCompletedSets = exercises.reduce((acc, ex) => acc + ex.sets.filter(s => s.isCompleted).length, 0);
   const totalSets = exercises.reduce((acc, ex) => acc + ex.sets.length, 0);
@@ -176,7 +316,6 @@ const ActiveWorkout = () => {
   };
 
   const finishWorkout = () => {
-    // Calculate workout summary data
     const totalVolume = exercises.reduce((acc, ex) => {
       return acc + ex.sets.reduce((setAcc, set) => {
         if (set.isCompleted && set.weight && set.reps) {
@@ -196,7 +335,7 @@ const ActiveWorkout = () => {
         }
         return acc;
       }, 0),
-      formScore: Math.floor(Math.random() * 15) + 80, // Simulated form score
+      formScore: Math.floor(Math.random() * 15) + 80,
     }));
 
     navigate("/workout-summary", {
@@ -207,7 +346,7 @@ const ActiveWorkout = () => {
         totalExercises: exercises.length,
         setsCompleted: totalCompletedSets,
         totalSets,
-        personalRecords: Math.random() > 0.7 ? 1 : 0, // Simulated PR
+        personalRecords: Math.random() > 0.7 ? 1 : 0,
         avgFormScore: Math.floor(Math.random() * 10) + 82,
         exercises: exerciseSummaries,
       }
@@ -314,6 +453,112 @@ const ActiveWorkout = () => {
           <ChevronRight className="h-5 w-5" />
         </button>
       </div>
+
+      {/* Exercise Info Toggle */}
+      <button
+        onClick={() => setShowExerciseInfo(!showExerciseInfo)}
+        className="flex items-center justify-between px-4 py-3 bg-primary/5 border-b border-border hover:bg-primary/10 transition-colors"
+      >
+        <div className="flex items-center gap-2">
+          <Info className="h-4 w-4 text-primary" />
+          <span className="text-sm font-medium text-foreground">How to perform this exercise</span>
+        </div>
+        {showExerciseInfo ? (
+          <ChevronUp className="h-4 w-4 text-muted-foreground" />
+        ) : (
+          <ChevronDown className="h-4 w-4 text-muted-foreground" />
+        )}
+      </button>
+
+      {/* Collapsible Exercise Info Panel */}
+      {showExerciseInfo && (
+        <div className="border-b border-border bg-card animate-in slide-in-from-top-2 duration-200">
+          {/* Video Section */}
+          <div className="relative aspect-video bg-black/90">
+            {isVideoPlaying && exerciseInfo.videoUrl ? (
+              <video
+                src={exerciseInfo.videoUrl}
+                poster={exerciseInfo.videoPoster}
+                autoPlay
+                loop
+                muted={isMuted}
+                playsInline
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <>
+                <img 
+                  src={exerciseInfo.videoPoster}
+                  alt={`${currentExercise.name} demonstration`}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                  <button
+                    onClick={() => setIsVideoPlaying(true)}
+                    className="h-14 w-14 rounded-full bg-primary/90 flex items-center justify-center hover:bg-primary transition-colors shadow-lg"
+                  >
+                    <Play className="h-6 w-6 text-primary-foreground ml-1" />
+                  </button>
+                </div>
+              </>
+            )}
+            
+            {isVideoPlaying && (
+              <button
+                onClick={() => setIsMuted(!isMuted)}
+                className="absolute bottom-3 right-3 h-8 w-8 rounded-full bg-black/50 flex items-center justify-center hover:bg-black/70 transition-colors"
+              >
+                {isMuted ? (
+                  <VolumeX className="h-4 w-4 text-white" />
+                ) : (
+                  <Volume2 className="h-4 w-4 text-white" />
+                )}
+              </button>
+            )}
+          </div>
+
+          {/* Description & Steps */}
+          <div className="p-4 space-y-4">
+            <p className="text-sm text-muted-foreground">{exerciseInfo.description}</p>
+            
+            {/* How to perform */}
+            <div className="space-y-2">
+              <h4 className="text-sm font-semibold text-foreground flex items-center gap-2">
+                <Target className="h-4 w-4 text-primary" />
+                How to Perform
+              </h4>
+              <div className="space-y-2">
+                {exerciseInfo.howToPerform.map((step, i) => (
+                  <div key={i} className="flex items-start gap-2">
+                    <span className="h-5 w-5 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <span className="text-xs text-primary font-bold">{i + 1}</span>
+                    </span>
+                    <p className="text-sm text-foreground">{step}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Tips */}
+            <div className="space-y-2">
+              <h4 className="text-sm font-semibold text-foreground flex items-center gap-2">
+                <CheckCircle2 className="h-4 w-4 text-success" />
+                Pro Tips
+              </h4>
+              <div className="flex flex-wrap gap-2">
+                {exerciseInfo.tips.map((tip, i) => (
+                  <span 
+                    key={i}
+                    className="px-3 py-1.5 rounded-full bg-success/10 text-success text-xs font-medium"
+                  >
+                    {tip}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Target info */}
       <div className="px-4 py-3 bg-secondary/30">

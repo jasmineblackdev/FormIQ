@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 import { FormScoreBadge } from "@/components/ui/FormScoreBadge";
-import { ChevronRight, Dumbbell } from "lucide-react";
+import { Dumbbell } from "lucide-react";
 
 interface ExerciseCardProps {
   name: string;
@@ -10,6 +10,7 @@ interface ExerciseCardProps {
   lastFormScore?: number;
   isCompleted?: boolean;
   onClick?: () => void;
+  showChevron?: boolean;
   className?: string;
 }
 
@@ -21,6 +22,7 @@ export function ExerciseCard({
   lastFormScore,
   isCompleted = false,
   onClick,
+  showChevron = false,
   className,
 }: ExerciseCardProps) {
   return (
@@ -56,14 +58,12 @@ export function ExerciseCard({
         </p>
       </div>
 
-      {/* Form score or chevron */}
-      <div className="flex-shrink-0">
-        {lastFormScore !== undefined ? (
+      {/* Form score only - no chevron on home */}
+      {lastFormScore !== undefined && (
+        <div className="flex-shrink-0">
           <FormScoreBadge score={lastFormScore} size="sm" />
-        ) : (
-          <ChevronRight className="h-5 w-5 text-muted-foreground" />
-        )}
-      </div>
+        </div>
+      )}
     </button>
   );
 }
