@@ -11,6 +11,7 @@ import Profile from "./pages/Profile";
 import Record from "./pages/Record";
 import Analyze from "./pages/Analyze";
 import ActiveWorkout from "./pages/ActiveWorkout";
+import FormFeedback from "./pages/FormFeedback";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,6 +31,7 @@ const App = () => (
           <Route path="/record" element={<Record />} />
           <Route path="/analyze" element={<Analyze />} />
           <Route path="/active-workout" element={<ActiveWorkout />} />
+          <Route path="/form-feedback" element={<FormFeedback />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
