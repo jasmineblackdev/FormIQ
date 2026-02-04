@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,9 @@ import {
   X, 
   Timer,
   Video,
-  Trash2
+  Trash2,
+  Pause,
+  Play
 } from "lucide-react";
 
 interface SetData {
@@ -105,6 +107,23 @@ const ActiveWorkout = () => {
   const [exercises, setExercises] = useState<ExerciseData[]>(initialExercises);
   const [currentExerciseIndex, setCurrentExerciseIndex] = useState(0);
   const [elapsedTime, setElapsedTime] = useState(0);
+  const [isTimerPaused, setIsTimerPaused] = useState(false);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Timer effect
+  useEffect(() => {
+    if (!isTimerPaused) {
+      timerRef.current = setInterval(() => {
+        setElapsedTime(prev => prev + 1);
+      }, 1000);
+    }
+
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    };
+  }, [isTimerPaused]);
 
   const currentExercise = exercises[currentExerciseIndex];
   const completedSets = currentExercise.sets.filter(s => s.isCompleted).length;
@@ -157,7 +176,46 @@ const ActiveWorkout = () => {
   };
 
   const finishWorkout = () => {
-    navigate("/");
+    // Calculate workout summary data
+    const totalVolume = exercises.reduce((acc, ex) => {
+      return acc + ex.sets.reduce((setAcc, set) => {
+        if (set.isCompleted && set.weight && set.reps) {
+          return setAcc + (parseFloat(set.weight) * parseFloat(set.reps));
+        }
+        return setAcc;
+      }, 0);
+    }, 0);
+
+    const exerciseSummaries = exercises.map(ex => ({
+      name: ex.name,
+      setsCompleted: ex.sets.filter(s => s.isCompleted).length,
+      totalSets: ex.sets.length,
+      totalVolume: ex.sets.reduce((acc, set) => {
+        if (set.isCompleted && set.weight && set.reps) {
+          return acc + (parseFloat(set.weight) * parseFloat(set.reps));
+        }
+        return acc;
+      }, 0),
+      formScore: Math.floor(Math.random() * 15) + 80, // Simulated form score
+    }));
+
+    navigate("/workout-summary", {
+      state: {
+        duration: elapsedTime,
+        totalVolume: Math.round(totalVolume),
+        exercisesCompleted: exercises.filter(ex => ex.sets.some(s => s.isCompleted)).length,
+        totalExercises: exercises.length,
+        setsCompleted: totalCompletedSets,
+        totalSets,
+        personalRecords: Math.random() > 0.7 ? 1 : 0, // Simulated PR
+        avgFormScore: Math.floor(Math.random() * 10) + 82,
+        exercises: exerciseSummaries,
+      }
+    });
+  };
+
+  const toggleTimer = () => {
+    setIsTimerPaused(prev => !prev);
   };
 
   const formatTime = (seconds: number) => {
@@ -178,10 +236,22 @@ const ActiveWorkout = () => {
             <X className="h-5 w-5" />
           </button>
           
-          <div className="flex items-center gap-2 text-foreground">
-            <Timer className="h-4 w-4 text-primary" />
-            <span className="font-mono font-medium">{formatTime(elapsedTime)}</span>
-          </div>
+          <button 
+            onClick={toggleTimer}
+            className="flex items-center gap-2 text-foreground hover:text-primary transition-colors"
+          >
+            {isTimerPaused ? (
+              <Play className="h-4 w-4 text-success" />
+            ) : (
+              <Pause className="h-4 w-4 text-primary" />
+            )}
+            <span className={cn(
+              "font-mono font-medium",
+              isTimerPaused && "text-muted-foreground"
+            )}>
+              {formatTime(elapsedTime)}
+            </span>
+          </button>
           
           <Button
             variant="ghost"
