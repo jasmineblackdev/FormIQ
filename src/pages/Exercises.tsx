@@ -1,13 +1,25 @@
 import { AppLayout } from "@/components/layout/AppLayout";
 import { ExerciseCard } from "@/components/workout/ExerciseCard";
+import { ExerciseDetailSheet } from "@/components/exercises/ExerciseDetailSheet";
 import { Input } from "@/components/ui/input";
-import { Search, Filter } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Search, Plus, CheckCircle2 } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 const muscleGroups = ["All", "Chest", "Back", "Shoulders", "Legs", "Arms", "Core"];
 
-const exercises = [
+interface Exercise {
+  name: string;
+  sets: number;
+  reps: string;
+  targetMuscle: string;
+  lastFormScore?: number;
+}
+
+const exercises: Exercise[] = [
   { name: "Bench Press", sets: 4, reps: "8-10", targetMuscle: "Chest", lastFormScore: 92 },
   { name: "Incline Dumbbell Press", sets: 3, reps: "10-12", targetMuscle: "Chest", lastFormScore: 85 },
   { name: "Deadlift", sets: 4, reps: "5", targetMuscle: "Back", lastFormScore: 78 },
@@ -25,14 +37,36 @@ const exercises = [
 ];
 
 const Exercises = () => {
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [selectedMuscle, setSelectedMuscle] = useState("All");
+  const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [addedExercises, setAddedExercises] = useState<string[]>([]);
 
   const filteredExercises = exercises.filter((ex) => {
     const matchesSearch = ex.name.toLowerCase().includes(search.toLowerCase());
     const matchesMuscle = selectedMuscle === "All" || ex.targetMuscle === selectedMuscle;
     return matchesSearch && matchesMuscle;
   });
+
+  const handleExerciseClick = (exercise: Exercise) => {
+    setSelectedExercise(exercise);
+    setSheetOpen(true);
+  };
+
+  const handleAddToWorkout = (exercise: Exercise) => {
+    if (!addedExercises.includes(exercise.name)) {
+      setAddedExercises([...addedExercises, exercise.name]);
+      toast.success(`${exercise.name} added to workout`);
+    }
+    setSheetOpen(false);
+  };
+
+  const handleRecordForm = (exercise: Exercise) => {
+    setSheetOpen(false);
+    navigate('/record');
+  };
 
   return (
     <AppLayout
@@ -47,9 +81,20 @@ const Exercises = () => {
     >
       <div className="px-4 py-6 space-y-6">
         {/* Header */}
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Exercise Library</h1>
-          <p className="text-muted-foreground text-sm">100+ movements with AI form analysis</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">Exercise Library</h1>
+            <p className="text-muted-foreground text-sm">100+ movements with AI form analysis</p>
+          </div>
+          {addedExercises.length > 0 && (
+            <Button 
+              onClick={() => navigate('/active-workout')}
+              className="gap-2"
+            >
+              <CheckCircle2 className="h-4 w-4" />
+              {addedExercises.length} Added
+            </Button>
+          )}
         </div>
 
         {/* Search */}
@@ -84,11 +129,18 @@ const Exercises = () => {
         {/* Exercise list */}
         <div className="space-y-2">
           {filteredExercises.map((exercise, index) => (
-            <ExerciseCard
-              key={index}
-              {...exercise}
-              onClick={() => console.log("Exercise selected:", exercise.name)}
-            />
+            <div key={index} className="relative">
+              <ExerciseCard
+                {...exercise}
+                onClick={() => handleExerciseClick(exercise)}
+                isCompleted={addedExercises.includes(exercise.name)}
+              />
+              {addedExercises.includes(exercise.name) && (
+                <div className="absolute top-3 right-3">
+                  <CheckCircle2 className="h-5 w-5 text-success" />
+                </div>
+              )}
+            </div>
           ))}
         </div>
 
@@ -98,6 +150,15 @@ const Exercises = () => {
           </div>
         )}
       </div>
+
+      {/* Exercise detail sheet */}
+      <ExerciseDetailSheet
+        exercise={selectedExercise}
+        open={sheetOpen}
+        onOpenChange={setSheetOpen}
+        onAddToWorkout={handleAddToWorkout}
+        onRecordForm={handleRecordForm}
+      />
     </AppLayout>
   );
 };
