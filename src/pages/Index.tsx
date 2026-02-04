@@ -7,7 +7,9 @@ import { HomeRestDay } from "@/components/home/HomeRestDay";
 import { HomeCompleted } from "@/components/home/HomeCompleted";
 import { HomeCustomEmpty } from "@/components/home/HomeCustomEmpty";
 import { HomeCustomActive } from "@/components/home/HomeCustomActive";
+import { ExerciseDetailSheet } from "@/components/exercises/ExerciseDetailSheet";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 type HomeState = "first-day" | "mid-program" | "rest-day" | "completed" | "custom-empty" | "custom-active";
 
@@ -20,9 +22,38 @@ const stateLabels: Record<HomeState, string> = {
   "custom-active": "Custom Active",
 };
 
+// Exercise data for all home states
+const exerciseDatabase: Record<string, { sets: number; reps: string; targetMuscle: string; lastFormScore?: number }> = {
+  "Bench Press": { sets: 4, reps: "8-10", targetMuscle: "Chest", lastFormScore: 92 },
+  "Incline Dumbbell Press": { sets: 3, reps: "10-12", targetMuscle: "Upper Chest", lastFormScore: 85 },
+  "Overhead Press": { sets: 4, reps: "8-10", targetMuscle: "Shoulders", lastFormScore: 91 },
+  "Cable Flyes": { sets: 3, reps: "12-15", targetMuscle: "Chest" },
+  "Tricep Pushdowns": { sets: 3, reps: "12-15", targetMuscle: "Triceps" },
+  "Lateral Raises": { sets: 3, reps: "15-20", targetMuscle: "Side Delts" },
+  "Deadlift": { sets: 4, reps: "5", targetMuscle: "Back / Posterior Chain", lastFormScore: 87 },
+  "Barbell Rows": { sets: 4, reps: "8-10", targetMuscle: "Upper Back", lastFormScore: 92 },
+  "Lat Pulldowns": { sets: 3, reps: "10-12", targetMuscle: "Lats", lastFormScore: 78 },
+  "Face Pulls": { sets: 3, reps: "15-20", targetMuscle: "Rear Delts", lastFormScore: 85 },
+  "Barbell Curls": { sets: 3, reps: "10-12", targetMuscle: "Biceps", lastFormScore: 91 },
+  "Hammer Curls": { sets: 3, reps: "12-15", targetMuscle: "Brachialis", lastFormScore: 88 },
+  "Squat": { sets: 4, reps: "6-8", targetMuscle: "Quads / Glutes", lastFormScore: 86 },
+  "Romanian Deadlift": { sets: 4, reps: "8-10", targetMuscle: "Hamstrings", lastFormScore: 82 },
+  "Leg Press": { sets: 3, reps: "10-12", targetMuscle: "Quads" },
+};
+
+interface Exercise {
+  name: string;
+  sets: number;
+  reps: string;
+  targetMuscle: string;
+  lastFormScore?: number;
+}
+
 const Index = () => {
   const navigate = useNavigate();
   const [currentState, setCurrentState] = useState<HomeState>("first-day");
+  const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
+  const [sheetOpen, setSheetOpen] = useState(false);
 
   const handleStartWorkout = () => {
     navigate("/active-workout");
@@ -45,7 +76,24 @@ const Index = () => {
   };
 
   const handleExerciseClick = (exerciseName: string) => {
-    navigate("/exercises", { state: { selectedExercise: exerciseName } });
+    const exerciseData = exerciseDatabase[exerciseName];
+    if (exerciseData) {
+      setSelectedExercise({
+        name: exerciseName,
+        ...exerciseData
+      });
+      setSheetOpen(true);
+    }
+  };
+
+  const handleAddToWorkout = (exercise: Exercise) => {
+    toast.success(`${exercise.name} added to workout`);
+    setSheetOpen(false);
+  };
+
+  const handleRecordForm = (exercise: Exercise) => {
+    setSheetOpen(false);
+    navigate('/record');
   };
 
   // Program info based on current state
@@ -159,6 +207,15 @@ const Index = () => {
 
       {/* Current home state */}
       {renderHomeState()}
+
+      {/* Exercise Detail Sheet */}
+      <ExerciseDetailSheet
+        exercise={selectedExercise}
+        open={sheetOpen}
+        onOpenChange={setSheetOpen}
+        onAddToWorkout={handleAddToWorkout}
+        onRecordForm={handleRecordForm}
+      />
     </AppLayout>
   );
 };
