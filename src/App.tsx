@@ -12,6 +12,7 @@ import Record from "./pages/Record";
 import Analyze from "./pages/Analyze";
 import ActiveWorkout from "./pages/ActiveWorkout";
 import FormFeedback from "./pages/FormFeedback";
+import WorkoutSummary from "./pages/WorkoutSummary";
 import GoalsSettings from "./pages/Settings/GoalsSettings";
 import WorkoutPreferences from "./pages/Settings/WorkoutPreferences";
 import NotificationSettings from "./pages/Settings/NotificationSettings";
@@ -37,6 +38,7 @@ const App = () => (
           <Route path="/analyze" element={<Analyze />} />
           <Route path="/active-workout" element={<ActiveWorkout />} />
           <Route path="/form-feedback" element={<FormFeedback />} />
+          <Route path="/workout-summary" element={<WorkoutSummary />} />
           <Route path="/settings/goals" element={<GoalsSettings />} />
           <Route path="/settings/preferences" element={<WorkoutPreferences />} />
           <Route path="/settings/notifications" element={<NotificationSettings />} />
