@@ -1,12 +1,12 @@
 import { cn } from "@/lib/utils";
-import { Home, Video, Sparkles, BarChart3, User } from "lucide-react";
+import { Home, Dumbbell, Video, Sparkles, User } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 
 const navItems = [
   { icon: Home, label: "Home", path: "/" },
+  { icon: Dumbbell, label: "Exercises", path: "/exercises" },
   { icon: Video, label: "Record", path: "/record", highlight: true },
   { icon: Sparkles, label: "Analyze", path: "/analyze" },
-  { icon: BarChart3, label: "Progress", path: "/progress" },
   { icon: User, label: "Profile", path: "/profile" },
 ];
 
