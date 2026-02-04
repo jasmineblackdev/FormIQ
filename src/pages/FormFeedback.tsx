@@ -14,19 +14,30 @@ import {
   X,
   TrendingUp,
   Target,
-  Zap
+  Zap,
+  Save,
+  Trash2,
+  Archive
 } from "lucide-react";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { toast } from "sonner";
 
 // Mock analysis data
-const analysisData = {
-  exercise: "Bench Press",
+const getAnalysisData = (exerciseName: string, duration: string) => ({
+  exercise: exerciseName || "Bench Press",
   overallScore: 85,
   previousScore: 78,
   date: "Just now",
-  duration: "0:45",
+  duration: duration || "0:45",
   reps: 8,
   weight: "135 lbs",
   highlights: [
@@ -62,14 +73,64 @@ const analysisData = {
       priority: "low"
     }
   ]
-};
+});
 
 const FormFeedback = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [isPlaying, setIsPlaying] = useState(false);
   const [selectedRep, setSelectedRep] = useState<number | null>(null);
-
+  const [showSaveDialog, setShowSaveDialog] = useState(false);
+  const [hasShownDialog, setHasShownDialog] = useState(false);
+  
+  // Get data from navigation state
+  const exerciseName = location.state?.exercise || "Bench Press";
+  const duration = location.state?.duration || "0:45";
+  
+  const analysisData = getAnalysisData(exerciseName, duration);
   const improvement = analysisData.overallScore - analysisData.previousScore;
+
+  const handleClose = () => {
+    if (!hasShownDialog) {
+      setShowSaveDialog(true);
+      setHasShownDialog(true);
+    } else {
+      navigate(-1);
+    }
+  };
+
+  const handleSaveToArchive = () => {
+    toast.success("Video saved to archive!", {
+      description: `${analysisData.exercise} - Score: ${analysisData.overallScore}`,
+      action: {
+        label: "View",
+        onClick: () => navigate('/analyze', { state: { tab: 'archive' } })
+      }
+    });
+    setShowSaveDialog(false);
+    navigate('/analyze', { state: { tab: 'archive' } });
+  };
+
+  const handleDiscardVideo = () => {
+    toast.info("Video discarded");
+    setShowSaveDialog(false);
+    navigate(-1);
+  };
+
+  const handleRecordAnother = () => {
+    if (!hasShownDialog) {
+      setShowSaveDialog(true);
+      setHasShownDialog(true);
+    } else {
+      navigate('/record');
+    }
+  };
+
+  const handleRecordAnotherAfterSave = () => {
+    toast.success("Video saved to archive!");
+    setShowSaveDialog(false);
+    navigate('/record');
+  };
 
   return (
     <AppLayout hideProgress>
@@ -77,12 +138,17 @@ const FormFeedback = () => {
         {/* Header */}
         <div className="sticky top-0 z-10 bg-background/95 backdrop-blur border-b border-border px-4 py-3">
           <div className="flex items-center justify-between">
-            <button onClick={() => navigate(-1)} className="p-2 -ml-2">
+            <button onClick={handleClose} className="p-2 -ml-2">
               <X className="h-5 w-5 text-muted-foreground" />
             </button>
             <h1 className="font-semibold text-foreground">Form Analysis</h1>
             <div className="flex items-center gap-2">
-              <button className="p-2">
+              <button 
+                onClick={() => {
+                  handleSaveToArchive();
+                }}
+                className="p-2"
+              >
                 <Bookmark className="h-5 w-5 text-muted-foreground" />
               </button>
               <button className="p-2 -mr-2">
@@ -278,14 +344,22 @@ const FormFeedback = () => {
           {/* Action Buttons */}
           <div className="space-y-3 pt-2">
             <Button 
+              className="w-full gap-2 gradient-primary"
+              onClick={() => handleSaveToArchive()}
+            >
+              <Archive className="h-4 w-4" />
+              Save to Archive
+            </Button>
+            <Button 
               className="w-full gap-2"
-              onClick={() => navigate('/record')}
+              variant="outline"
+              onClick={handleRecordAnother}
             >
               <RotateCcw className="h-4 w-4" />
               Record Another Set
             </Button>
             <Button 
-              variant="outline" 
+              variant="ghost" 
               className="w-full gap-2"
               onClick={() => navigate('/active-workout')}
             >
@@ -295,6 +369,59 @@ const FormFeedback = () => {
           </div>
         </div>
       </div>
+
+      {/* Save Video Dialog */}
+      <Dialog open={showSaveDialog} onOpenChange={setShowSaveDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Save className="h-5 w-5 text-primary" />
+              Save Recording?
+            </DialogTitle>
+            <DialogDescription>
+              Would you like to save this recording to your archive for future reference?
+            </DialogDescription>
+          </DialogHeader>
+          
+          {/* Preview */}
+          <div className="p-4 rounded-xl bg-secondary/50 flex items-center gap-4">
+            <div className="h-16 w-20 rounded-lg bg-black/80 flex items-center justify-center">
+              <Play className="h-6 w-6 text-white/60" />
+            </div>
+            <div className="flex-1">
+              <p className="font-semibold text-foreground">{analysisData.exercise}</p>
+              <p className="text-sm text-muted-foreground">{analysisData.duration} • {analysisData.reps} reps</p>
+            </div>
+            <FormScoreBadge score={analysisData.overallScore} size="sm" />
+          </div>
+
+          <div className="flex flex-col gap-2 pt-2">
+            <Button 
+              className="w-full gap-2 gradient-primary" 
+              onClick={handleSaveToArchive}
+            >
+              <Archive className="h-4 w-4" />
+              Save to Archive
+            </Button>
+            <Button 
+              variant="outline" 
+              className="w-full gap-2"
+              onClick={handleRecordAnotherAfterSave}
+            >
+              <Save className="h-4 w-4" />
+              Save & Record Another
+            </Button>
+            <Button 
+              variant="ghost" 
+              className="w-full gap-2 text-destructive hover:text-destructive"
+              onClick={handleDiscardVideo}
+            >
+              <Trash2 className="h-4 w-4" />
+              Discard Video
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </AppLayout>
   );
 };
