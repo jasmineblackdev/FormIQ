@@ -12,6 +12,11 @@ import Record from "./pages/Record";
 import Analyze from "./pages/Analyze";
 import ActiveWorkout from "./pages/ActiveWorkout";
 import FormFeedback from "./pages/FormFeedback";
+import GoalsSettings from "./pages/Settings/GoalsSettings";
+import WorkoutPreferences from "./pages/Settings/WorkoutPreferences";
+import NotificationSettings from "./pages/Settings/NotificationSettings";
+import PrivacySettings from "./pages/Settings/PrivacySettings";
+import HelpSupport from "./pages/Settings/HelpSupport";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -32,6 +37,11 @@ const App = () => (
           <Route path="/analyze" element={<Analyze />} />
           <Route path="/active-workout" element={<ActiveWorkout />} />
           <Route path="/form-feedback" element={<FormFeedback />} />
+          <Route path="/settings/goals" element={<GoalsSettings />} />
+          <Route path="/settings/preferences" element={<WorkoutPreferences />} />
+          <Route path="/settings/notifications" element={<NotificationSettings />} />
+          <Route path="/settings/privacy" element={<PrivacySettings />} />
+          <Route path="/settings/help" element={<HelpSupport />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
