@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { HomeFirstDay } from "@/components/home/HomeFirstDay";
 import { HomeMidProgram } from "@/components/home/HomeMidProgram";
@@ -20,7 +21,12 @@ const stateLabels: Record<HomeState, string> = {
 };
 
 const Index = () => {
+  const navigate = useNavigate();
   const [currentState, setCurrentState] = useState<HomeState>("first-day");
+
+  const handleStartWorkout = () => {
+    navigate("/active-workout");
+  };
 
   // Program info based on current state
   const getProgramInfo = () => {
@@ -44,9 +50,9 @@ const Index = () => {
   const renderHomeState = () => {
     switch (currentState) {
       case "first-day":
-        return <HomeFirstDay onStartWorkout={() => console.log("Start workout")} />;
+        return <HomeFirstDay onStartWorkout={handleStartWorkout} />;
       case "mid-program":
-        return <HomeMidProgram onStartWorkout={() => console.log("Start workout")} />;
+        return <HomeMidProgram onStartWorkout={handleStartWorkout} />;
       case "rest-day":
         return <HomeRestDay onViewNextWorkout={() => console.log("View next workout")} />;
       case "completed":
@@ -54,15 +60,15 @@ const Index = () => {
       case "custom-empty":
         return (
           <HomeCustomEmpty 
-            onStartWorkout={() => console.log("Start workout")} 
-            onBrowseExercises={() => console.log("Browse exercises")}
+            onStartWorkout={handleStartWorkout} 
+            onBrowseExercises={() => navigate("/exercises")}
           />
         );
       case "custom-active":
         return (
           <HomeCustomActive 
-            onStartWorkout={() => console.log("Start workout")} 
-            onBrowseExercises={() => console.log("Browse exercises")}
+            onStartWorkout={handleStartWorkout} 
+            onBrowseExercises={() => navigate("/exercises")}
           />
         );
       default:
