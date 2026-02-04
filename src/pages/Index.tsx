@@ -44,6 +44,10 @@ const Index = () => {
     navigate("/analyze");
   };
 
+  const handleExerciseClick = (exerciseName: string) => {
+    navigate("/exercises", { state: { selectedExercise: exerciseName } });
+  };
+
   // Program info based on current state
   const getProgramInfo = () => {
     switch (currentState) {
@@ -66,13 +70,28 @@ const Index = () => {
   const renderHomeState = () => {
     switch (currentState) {
       case "first-day":
-        return <HomeFirstDay onStartWorkout={handleStartWorkout} />;
+        return (
+          <HomeFirstDay 
+            onStartWorkout={handleStartWorkout}
+            onExerciseClick={handleExerciseClick}
+            onViewProgram={handleViewProgram}
+          />
+        );
       case "mid-program":
-        return <HomeMidProgram onStartWorkout={handleStartWorkout} />;
+        return (
+          <HomeMidProgram 
+            onStartWorkout={handleStartWorkout}
+            onExerciseClick={handleExerciseClick}
+            onViewProgress={handleViewProgress}
+            onViewProgram={handleViewProgram}
+          />
+        );
       case "rest-day":
         return (
           <HomeRestDay 
             onViewNextWorkout={handleViewProgram}
+            onExerciseClick={handleExerciseClick}
+            onViewProgram={handleViewProgram}
           />
         );
       case "completed":
@@ -97,7 +116,13 @@ const Index = () => {
           />
         );
       default:
-        return <HomeFirstDay onStartWorkout={handleStartWorkout} />;
+        return (
+          <HomeFirstDay 
+            onStartWorkout={handleStartWorkout}
+            onExerciseClick={handleExerciseClick}
+            onViewProgram={handleViewProgram}
+          />
+        );
     }
   };
 
