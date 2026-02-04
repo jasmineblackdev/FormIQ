@@ -22,6 +22,25 @@ const stateLabels: Record<HomeState, string> = {
 const Index = () => {
   const [currentState, setCurrentState] = useState<HomeState>("first-day");
 
+  // Program info based on current state
+  const getProgramInfo = () => {
+    switch (currentState) {
+      case "first-day":
+        return { currentWeek: 1, totalWeeks: 6, currentDay: 1, totalDays: 18, isRestDay: false };
+      case "mid-program":
+        return { currentWeek: 3, totalWeeks: 6, currentDay: 8, totalDays: 18, isRestDay: false };
+      case "rest-day":
+        return { currentWeek: 2, totalWeeks: 6, currentDay: 4, totalDays: 18, isRestDay: true };
+      case "completed":
+        return { currentWeek: 2, totalWeeks: 6, currentDay: 5, totalDays: 18, isRestDay: false };
+      case "custom-empty":
+      case "custom-active":
+        return undefined; // No program for custom path
+      default:
+        return { currentWeek: 1, totalWeeks: 6, currentDay: 1, totalDays: 18, isRestDay: false };
+    }
+  };
+
   const renderHomeState = () => {
     switch (currentState) {
       case "first-day":
@@ -51,10 +70,16 @@ const Index = () => {
     }
   };
 
+  const programInfo = getProgramInfo();
+  const isCustomPath = currentState === "custom-empty" || currentState === "custom-active";
+
   return (
-    <AppLayout>
+    <AppLayout 
+      hideProgress={isCustomPath}
+      programInfo={programInfo}
+    >
       {/* State selector for demo purposes */}
-      <div className="sticky top-0 z-40 bg-background/80 backdrop-blur-xl border-b border-border">
+      <div className="sticky top-0 z-30 bg-background/80 backdrop-blur-xl border-b border-border">
         <div className="px-4 py-3">
           <p className="text-xs text-muted-foreground mb-2 font-medium">Demo: Home Screen States</p>
           <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
