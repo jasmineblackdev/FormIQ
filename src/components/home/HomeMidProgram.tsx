@@ -7,6 +7,9 @@ import { Play, TrendingUp } from "lucide-react";
 
 interface HomeMidProgramProps {
   onStartWorkout?: () => void;
+  onExerciseClick?: (exerciseName: string) => void;
+  onViewProgress?: () => void;
+  onViewProgram?: () => void;
 }
 
 const todaysExercises = [
@@ -22,7 +25,7 @@ const averageFormScore = Math.round(
   todaysExercises.reduce((sum, ex) => sum + (ex.lastFormScore || 0), 0) / todaysExercises.length
 );
 
-export function HomeMidProgram({ onStartWorkout }: HomeMidProgramProps) {
+export function HomeMidProgram({ onStartWorkout, onExerciseClick, onViewProgress, onViewProgram }: HomeMidProgramProps) {
   return (
     <div className="px-4 py-6 space-y-6 animate-slide-up">
       {/* Header greeting */}
@@ -32,30 +35,38 @@ export function HomeMidProgram({ onStartWorkout }: HomeMidProgramProps) {
       </div>
 
       {/* Program progress */}
-      <ProgramProgress
-        currentWeek={3}
-        totalWeeks={6}
-        currentDay={8}
-        totalDays={18}
-      />
+      <button onClick={onViewProgram} className="w-full">
+        <ProgramProgress
+          currentWeek={3}
+          totalWeeks={6}
+          currentDay={8}
+          totalDays={18}
+        />
+      </button>
 
       {/* Stats summary */}
       <div className="grid grid-cols-2 gap-3">
-        <div className="p-4 rounded-xl bg-card border border-border">
+        <button 
+          onClick={onViewProgress}
+          className="p-4 rounded-xl bg-card border border-border text-left hover:bg-accent transition-colors"
+        >
           <div className="flex items-center gap-2 text-primary mb-1">
             <TrendingUp className="h-4 w-4" />
             <span className="text-xs font-medium">Avg Form Score</span>
           </div>
           <p className="text-2xl font-bold text-foreground">{averageFormScore}</p>
           <p className="text-xs text-muted-foreground">+5 from last week</p>
-        </div>
-        <div className="p-4 rounded-xl bg-card border border-border">
+        </button>
+        <button 
+          onClick={onViewProgress}
+          className="p-4 rounded-xl bg-card border border-border text-left hover:bg-accent transition-colors"
+        >
           <div className="flex items-center gap-2 text-primary mb-1">
             <span className="text-xs font-medium">🔥 Streak</span>
           </div>
           <p className="text-2xl font-bold text-foreground">8 days</p>
           <p className="text-xs text-muted-foreground">Personal best!</p>
-        </div>
+        </button>
       </div>
 
       {/* Today's workout */}
@@ -90,6 +101,7 @@ export function HomeMidProgram({ onStartWorkout }: HomeMidProgramProps) {
             <ExerciseCard
               key={index}
               {...exercise}
+              onClick={() => onExerciseClick?.(exercise.name)}
             />
           ))}
         </div>

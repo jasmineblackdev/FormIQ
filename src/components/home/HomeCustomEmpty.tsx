@@ -58,13 +58,14 @@ export function HomeCustomEmpty({ onStartWorkout, onBrowseExercises }: HomeCusto
         <h3 className="font-semibold text-foreground">How it works</h3>
         <div className="space-y-2">
           {[
-            { step: "1", title: "Choose your exercises", desc: "Pick from 100+ movements" },
-            { step: "2", title: "Record your sets", desc: "Use AI to analyze your form" },
-            { step: "3", title: "Track progress", desc: "Watch your form scores improve" },
+            { step: "1", title: "Choose your exercises", desc: "Pick from 100+ movements", action: onBrowseExercises },
+            { step: "2", title: "Record your sets", desc: "Use AI to analyze your form", action: onStartWorkout },
+            { step: "3", title: "Track progress", desc: "Watch your form scores improve", action: onStartWorkout },
           ].map((item, index) => (
-            <div
+            <button
               key={index}
-              className="flex items-center gap-4 p-4 rounded-xl bg-card border border-border"
+              onClick={item.action}
+              className="w-full flex items-center gap-4 p-4 rounded-xl bg-card border border-border text-left hover:bg-accent transition-colors"
             >
               <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
                 <span className="text-lg font-bold text-primary">{item.step}</span>
@@ -73,7 +74,7 @@ export function HomeCustomEmpty({ onStartWorkout, onBrowseExercises }: HomeCusto
                 <p className="font-medium text-foreground text-sm">{item.title}</p>
                 <p className="text-xs text-muted-foreground">{item.desc}</p>
               </div>
-            </div>
+            </button>
           ))}
         </div>
       </div>

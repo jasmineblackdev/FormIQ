@@ -2,10 +2,13 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ProgramProgress } from "@/components/workout/ProgramProgress";
 import { ExerciseCard } from "@/components/workout/ExerciseCard";
-import { Moon, Battery, ChevronRight } from "lucide-react";
+import { Moon, Battery, ChevronRight, Check } from "lucide-react";
+import { useState } from "react";
 
 interface HomeRestDayProps {
   onViewNextWorkout?: () => void;
+  onExerciseClick?: (exerciseName: string) => void;
+  onViewProgram?: () => void;
 }
 
 const tomorrowsExercises = [
@@ -20,7 +23,17 @@ const recoveryTips = [
   { icon: "😴", title: "Sleep Well", desc: "8+ hours for recovery" },
 ];
 
-export function HomeRestDay({ onViewNextWorkout }: HomeRestDayProps) {
+export function HomeRestDay({ onViewNextWorkout, onExerciseClick, onViewProgram }: HomeRestDayProps) {
+  const [checkedItems, setCheckedItems] = useState<number[]>([]);
+
+  const toggleCheck = (index: number) => {
+    setCheckedItems(prev => 
+      prev.includes(index) 
+        ? prev.filter(i => i !== index)
+        : [...prev, index]
+    );
+  };
+
   return (
     <div className="px-4 py-6 space-y-6 animate-slide-up">
       {/* Header greeting */}
@@ -30,12 +43,14 @@ export function HomeRestDay({ onViewNextWorkout }: HomeRestDayProps) {
       </div>
 
       {/* Program progress */}
-      <ProgramProgress
-        currentWeek={2}
-        totalWeeks={6}
-        currentDay={6}
-        totalDays={18}
-      />
+      <button onClick={onViewProgram} className="w-full">
+        <ProgramProgress
+          currentWeek={2}
+          totalWeeks={6}
+          currentDay={6}
+          totalDays={18}
+        />
+      </button>
 
       {/* Rest day hero */}
       <div className="p-6 rounded-2xl bg-gradient-to-br from-secondary to-accent border border-border text-center">
@@ -56,16 +71,35 @@ export function HomeRestDay({ onViewNextWorkout }: HomeRestDayProps) {
         </h3>
         <div className="grid gap-2">
           {recoveryTips.map((tip, index) => (
-            <div
+            <button
               key={index}
-              className="flex items-center gap-3 p-3 rounded-xl bg-card border border-border"
+              onClick={() => toggleCheck(index)}
+              className={cn(
+                "flex items-center gap-3 p-3 rounded-xl bg-card border transition-all text-left",
+                checkedItems.includes(index) 
+                  ? "border-primary/50 bg-primary/5" 
+                  : "border-border hover:bg-accent"
+              )}
             >
               <span className="text-2xl">{tip.icon}</span>
               <div className="flex-1">
-                <p className="font-medium text-foreground text-sm">{tip.title}</p>
+                <p className={cn(
+                  "font-medium text-sm",
+                  checkedItems.includes(index) ? "text-primary" : "text-foreground"
+                )}>{tip.title}</p>
                 <p className="text-xs text-muted-foreground">{tip.desc}</p>
               </div>
-            </div>
+              <div className={cn(
+                "h-6 w-6 rounded-full border-2 flex items-center justify-center transition-all",
+                checkedItems.includes(index) 
+                  ? "border-primary bg-primary" 
+                  : "border-muted-foreground/30"
+              )}>
+                {checkedItems.includes(index) && (
+                  <Check className="h-4 w-4 text-primary-foreground" />
+                )}
+              </div>
+            </button>
           ))}
         </div>
       </div>
@@ -84,6 +118,7 @@ export function HomeRestDay({ onViewNextWorkout }: HomeRestDayProps) {
             <ExerciseCard
               key={index}
               {...exercise}
+              onClick={() => onExerciseClick?.(exercise.name)}
             />
           ))}
         </div>

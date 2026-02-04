@@ -7,6 +7,8 @@ import { Play } from "lucide-react";
 
 interface HomeFirstDayProps {
   onStartWorkout?: () => void;
+  onExerciseClick?: (exerciseName: string) => void;
+  onViewProgram?: () => void;
 }
 
 const todaysExercises = [
@@ -18,7 +20,7 @@ const todaysExercises = [
   { name: "Lateral Raises", sets: 3, reps: "15-20", targetMuscle: "Side Delts" },
 ];
 
-export function HomeFirstDay({ onStartWorkout }: HomeFirstDayProps) {
+export function HomeFirstDay({ onStartWorkout, onExerciseClick, onViewProgram }: HomeFirstDayProps) {
   return (
     <div className="px-4 py-6 space-y-6 animate-slide-up">
       {/* Header greeting */}
@@ -28,12 +30,14 @@ export function HomeFirstDay({ onStartWorkout }: HomeFirstDayProps) {
       </div>
 
       {/* Program progress */}
-      <ProgramProgress
-        currentWeek={1}
-        totalWeeks={6}
-        currentDay={1}
-        totalDays={18}
-      />
+      <button onClick={onViewProgram} className="w-full">
+        <ProgramProgress
+          currentWeek={1}
+          totalWeeks={6}
+          currentDay={1}
+          totalDays={18}
+        />
+      </button>
 
       {/* Today's workout */}
       <div className="space-y-4">
@@ -67,6 +71,7 @@ export function HomeFirstDay({ onStartWorkout }: HomeFirstDayProps) {
             <ExerciseCard
               key={index}
               {...exercise}
+              onClick={() => onExerciseClick?.(exercise.name)}
             />
           ))}
         </div>
