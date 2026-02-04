@@ -94,8 +94,15 @@ const Record = () => {
   const handleStopRecording = () => {
     setIsRecording(false);
     setIsPaused(false);
+    // Pass recording data to feedback page
+    navigate('/form-feedback', { 
+      state: { 
+        exercise: selectedExercise,
+        duration: formatTime(recordingTime),
+        recordingTime
+      } 
+    });
     setRecordingTime(0);
-    navigate('/form-feedback');
   };
 
   const handleSelectExercise = (exerciseName: string) => {
