@@ -33,7 +33,16 @@ const Progress = () => {
   const currentStreak = 5;
 
   return (
-    <AppLayout>
+    <AppLayout
+      programInfo={{
+        programName: "Push/Pull/Legs",
+        currentWeek: 2,
+        totalWeeks: 6,
+        currentDay: 6,
+        totalDays: 18,
+        isRestDay: false,
+      }}
+    >
       <div className="px-4 py-6 space-y-6">
         {/* Header */}
         <div>

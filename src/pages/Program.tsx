@@ -1,5 +1,4 @@
 import { AppLayout } from "@/components/layout/AppLayout";
-import { ProgramProgress } from "@/components/workout/ProgramProgress";
 import { ChevronLeft, ChevronRight, Check, Flame } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
@@ -57,7 +56,16 @@ const Program = () => {
   const [currentMonth] = useState("February 2026");
 
   return (
-    <AppLayout>
+    <AppLayout 
+      programInfo={{
+        programName: "Push/Pull/Legs",
+        currentWeek: 2,
+        totalWeeks: 6,
+        currentDay: 6,
+        totalDays: 36,
+        isRestDay: false,
+      }}
+    >
       <div className="px-4 py-6 space-y-6">
         {/* Header */}
         <div className="flex items-center gap-3">
@@ -69,14 +77,6 @@ const Program = () => {
             <p className="text-sm text-muted-foreground">6-Week Intermediate Program</p>
           </div>
         </div>
-
-        {/* Progress */}
-        <ProgramProgress
-          currentWeek={2}
-          totalWeeks={6}
-          currentDay={6}
-          totalDays={36}
-        />
 
         {/* Calendar */}
         <div className="p-4 rounded-2xl bg-card border border-border">
