@@ -19,6 +19,7 @@ import NotificationSettings from "./pages/Settings/NotificationSettings";
 import PrivacySettings from "./pages/Settings/PrivacySettings";
 import HelpSupport from "./pages/Settings/HelpSupport";
 import NotFound from "./pages/NotFound";
+import Onboarding from "./pages/Onboarding";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +31,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/onboarding" element={<Onboarding />} />
           <Route path="/exercises" element={<Exercises />} />
           <Route path="/program" element={<Program />} />
           <Route path="/progress" element={<Progress />} />
