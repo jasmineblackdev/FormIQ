@@ -20,6 +20,7 @@ import PrivacySettings from "./pages/Settings/PrivacySettings";
 import HelpSupport from "./pages/Settings/HelpSupport";
 import NotFound from "./pages/NotFound";
 import Onboarding from "./pages/Onboarding";
+import VideoLibrary from "./pages/VideoLibrary";
 
 const queryClient = new QueryClient();
 
@@ -46,6 +47,7 @@ const App = () => (
           <Route path="/settings/notifications" element={<NotificationSettings />} />
           <Route path="/settings/privacy" element={<PrivacySettings />} />
           <Route path="/settings/help" element={<HelpSupport />} />
+          <Route path="/video-library" element={<VideoLibrary />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
